@@ -98,7 +98,7 @@ def create_embeddings(chunks, index, batch_size=100):
         ids_batch = [x["id"] for x in meta_batch]
         texts = [x["text"] for x in meta_batch]
         try:
-            res = anthropic.embeddings.create(
+            res = client.embeddings.create(  # Changed from anthropic to client
                 model="claude-3-sonnet-20240229",
                 input=texts
             )
@@ -116,7 +116,7 @@ def create_embeddings(chunks, index, batch_size=100):
         } for x in meta_batch]
         to_upsert = list(zip(ids_batch, embeds, meta_batch))
         index.upsert(vectors=to_upsert)
-
+        
 def main():
     print("Scraping GitHub repositories...")
     data = scrape_github_repos(repositories)
