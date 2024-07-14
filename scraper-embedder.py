@@ -8,7 +8,7 @@ import tiktoken
 import toml
 from github import Github
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from openai import OpenAI
+from anthropic import Anthropic
 from tqdm.auto import tqdm
 
 # Load the secrets.toml file
@@ -19,7 +19,7 @@ PINECONE_API_KEY = secrets["API"]["PINECONE_API_KEY"]
 ANTHROPIC_API_KEY = secrets["API"]["ANTHROPIC_API_KEY"]
 GITHUB_TOKEN = secrets["API"]["GITHUB_TOKEN"]
 
-client = OpenAI(api_key=ANTHROPIC_API_KEY)
+anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
 
 # List of GitHub repositories to scrape
 repositories = [
@@ -89,23 +89,22 @@ def create_index_if_not_exists(index_name, dimension, metric):
     else:
         print(f"Index '{index_name}' already exists.")
 
-def create_embeddings(chunks, embed_model, index, batch_size=100):
+def create_embeddings(chunks, index, batch_size=100):
     for i in tqdm(range(0, len(chunks), batch_size)):
         i_end = min(len(chunks), i + batch_size)
         meta_batch = chunks[i:i_end]
         ids_batch = [x["id"] for x in meta_batch]
         texts = [x["text"] for x in meta_batch]
         try:
-            res = client.embeddings.create(input=texts, model=embed_model)
-        except Exception:
-            done = False
-            while not done:
-                time.sleep(5)
-                try:
-                    res = client.embeddings.create(input=texts, model=embed_model)
-                    done = True
-                except Exception:
-                    pass
+            res = anthropic.embeddings.create(
+                model="claude-3-sonnet-20240229",
+                input=texts
+            )
+        except Exception as e:
+            print(f"Error creating embeddings: {e}")
+            time.sleep(5)
+            continue
+
         embeds = [record.embedding for record in res.data]
         meta_batch = [{
             "repo": x["repo"],
@@ -131,7 +130,7 @@ def main():
 
     create_index_if_not_exists(
         index_name=PINECONE_INDEX_NAME,
-        dimension=1536,  # Dimension for Anthropic's text-embedding-model
+        dimension=1536,  # Dimension for Claude's text embedding model
         metric="cosine"
     )
 
@@ -140,7 +139,6 @@ def main():
     print("Creating embeddings and uploading to Pinecone...")
     create_embeddings(
         chunks=chunks,
-        embed_model="text-embedding-3-small",  # Use Anthropic's embedding model
         index=index,
         batch_size=100
     )
