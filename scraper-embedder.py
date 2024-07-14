@@ -1,7 +1,7 @@
 import os
 import time
 from uuid import uuid4
-
+import re
 import pandas as pd
 import pinecone
 import tiktoken
