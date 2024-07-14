@@ -1,42 +1,85 @@
-# SEO Q&A Chatbot
+# Architectural Code Q&A Chatbot
 
-This Python code implements a chatbot that answers questions related to SEO.  The chatbot is based on OpenAI's GPT-3.5 language model, which is a powerful and versatile natural language processing model.
-Sources used:
-- seobythesea.com
-- holisticseo.digital
-- guest posts published by Koray Tuğberk GÜBÜR on other publications.
+This Python application implements a chatbot that answers questions related to architectural code. The chatbot is based on Anthropic's Claude language model, which is a powerful and versatile natural language processing model.
+
+## Features
+
+- Scrapes code from specified GitHub repositories
+- Generates embeddings for code snippets using Anthropic's API
+- Stores embeddings in a Pinecone vector database for efficient retrieval
+- Provides a Streamlit-based user interface for asking questions about the code
+- Uses Claude to generate responses based on relevant code snippets
 
 ## Dependencies
 
-This code uses the following libraries:
-- `streamlit`: for building the user interface.
-- `pinecone`: for retrieving relevant text chunks based on a user's question.
-- `openai`: for generating responses to user questions.
-- `streamlit_chat`: for displaying chat history in the user interface.
+This code uses the following main libraries:
+- `streamlit`: for building the user interface
+- `pinecone`: for storing and retrieving relevant code snippets
+- `anthropic`: for generating embeddings and responses
+- `github`: for scraping code from GitHub repositories
+- `pandas`: for data manipulation
+- `tiktoken`: for tokenization
+- `asyncio`: for asynchronous operations
 
 To install these libraries, use the following command:
 ```
 pip install -r requirements.txt
 ```
 
+## Setup
+
+1. Clone this repository to your local machine.
+
+2. Create a `.streamlit/secrets.toml` file in the project root directory with the following content:
+   ```toml
+   [API]
+   PINECONE_API_KEY = "your_pinecone_api_key"
+   ANTHROPIC_API_KEY = "your_anthropic_api_key"
+   GITHUB_TOKEN = "your_github_personal_access_token"
+   PINECONE_INDEX_NAME = "your_pinecone_index_name"
+   PINECONE_ENV = "your_pinecone_environment"
+   ```
+   Replace the placeholder values with your actual API keys and configuration.
+
+3. Update the `repositories` list in `scraper-embedder.py` with the GitHub repositories you want to analyze.
+
+4. Run the scraper and embedder:
+   ```
+   python scraper-embedder.py
+   ```
+   This will scrape the specified repositories, create embeddings, and store them in Pinecone.
+
+5. Start the Streamlit app:
+   ```
+   streamlit run streamlit_app.py
+   ```
+
 ## Usage
 
-To run this code, first set the `PINECONE_API_KEY` and `OPEN_AI_API_KEY` environment variables with your Pinecone and OpenAI API keys, respectively. You can get an OpenAI API key by creating an account on the OpenAI website.
-
-Then, run the following command:
-```
-streamlit run streamlit_app.py
-```
-
-This will start the Streamlit server, and you can access the chatbot by opening a web browser and navigating to `http://localhost:8501`.
+1. Open a web browser and navigate to `http://localhost:8501` (or the URL provided by Streamlit).
+2. Enter your Anthropic API key in the sidebar.
+3. Ask questions about the architectural code in the repositories you've scraped.
+4. The chatbot will retrieve relevant code snippets and use Claude to generate responses.
 
 ## How it Works
 
-The chatbot works as follows:
-1. The user enters a question in the input field.
-2. The chatbot retrieves relevant text chunks based on the user's question using the Pinecone similarity search service.
-3. The chatbot adds the user's question to the retrieved text chunks to create an augmented query.
-4. The chatbot generates a response to the augmented query using OpenAI's GPT-3.5 (Chat GPT) language model.
-5. The chatbot displays the response to the user, along with the chat history.
+1. The scraper-embedder script scrapes code from specified GitHub repositories.
+2. It generates embeddings for code snippets using Anthropic's API.
+3. The embeddings are stored in a Pinecone vector database.
+4. When a user asks a question, the app retrieves relevant code snippets based on similarity search.
+5. The chatbot uses Claude to generate a response based on the question and relevant code snippets.
+6. The response is displayed to the user in the Streamlit interface.
 
-The chat history is saved in the `st.session_state` dictionary, which is a dictionary that persists across Streamlit sessions. The `message` function from the `streamlit_chat` library is used to display the chat history in the user interface.
+## Customization
+
+- To add more repositories, update the `repositories` list in `scraper-embedder.py`.
+- To modify the code file types being scraped, adjust the file extension check in the `scrape_github_repos` function.
+- To change the embedding model or other Anthropic API parameters, modify the relevant sections in `scraper-embedder.py` and `streamlit_app.py`.
+
+## Contributing
+
+Contributions to improve the chatbot or extend its functionality are welcome. Please feel free to submit issues or pull requests.
+
+## License
+
+[Specify your license here]
