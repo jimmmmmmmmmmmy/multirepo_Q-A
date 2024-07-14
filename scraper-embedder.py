@@ -14,19 +14,21 @@ from tqdm.auto import tqdm
 # Load the secrets.toml file
 secrets = toml.load(".streamlit/secrets.toml")
 
-# Retrieve the values
 PINECONE_API_KEY = secrets["API"]["PINECONE_API_KEY"]
 ANTHROPIC_API_KEY = secrets["API"]["ANTHROPIC_API_KEY"]
 GITHUB_TOKEN = secrets["API"]["GITHUB_TOKEN"]
 
-anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
+client = Anthropic(api_key=ANTHROPIC_API_KEY)
 
-# List of GitHub repositories to scrape
-repositories = [
-    "username/repo1",
-    "username/repo2",
-    # Add more repositories as needed
-]
+def read_repositories_from_md():
+    with open('case_studies.md', 'r') as file:
+        content = file.read()
+    
+    # Use regex to find all GitHub repository URLs
+    repo_urls = re.findall(r'https://github.com/([^/]+/[^/\)]+)', content)
+    return repo_urls
+
+repositories = read_repositories_from_md()
 
 def scrape_github_repos(repositories):
     """Scrape code from GitHub repositories"""
