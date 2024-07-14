@@ -19,7 +19,6 @@ This code uses the following main libraries:
 - `github`: for scraping code from GitHub repositories
 - `pandas`: for data manipulation
 - `tiktoken`: for tokenization
-- `asyncio`: for asynchronous operations
 
 To install these libraries, use the following command:
 ```
