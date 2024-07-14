@@ -1,6 +1,6 @@
 # Architectural Code Q&A Chatbot
 
-This Python application implements a chatbot that answers questions related to architectural code. The chatbot is based on Anthropic's Claude language model, which is a powerful and versatile natural language processing model.
+This Python application implements a chatbot that answers questions about Github repos
 
 ## Features
 
